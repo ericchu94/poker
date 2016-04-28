@@ -42,7 +42,7 @@ router.put('/users', bodyParser(), co.wrap(function *(ctx, next) {
   const users = app.context.users;
   const user = body.user;
 
-  if (!(user in users)) {
+  if (user && !(user in users)) {
     users[user] = {
       name: user,
       score: 100,

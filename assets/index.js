@@ -12,10 +12,13 @@ $(function () {
       data: {
         user: $('#user').val(),
       },
+      context: $('#user').parents('.form-group'),
     }).then(function () {
       $('#user').val('');
+      $(this).removeClass('has-error');
       $('#container').load(location.href + ' #content');
     }, function (err) {
+      $(this).addClass('has-error');
       console.log(err);
     });
   });
