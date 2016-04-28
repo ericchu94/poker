@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Poker Counter</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <h1>Poker Helper <small>by Eric Chu</small></h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 form-inline">
+          <div class="form-group">
+            <label class="sr-only">User</label>
+            <input type="text" id="user" placeholder="User"  class="form-control" />
+          </div>
+          <button id="add" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+
+      <div class="row" id="container">
+        <div class="col-xs-12" id="content">
+          <div class="row">
+            <div class="col-xs-12">
+              <h1>Pot <small><%= pot %></small></h1>
+            </div>
+          </div>
+          <div class="row">
+            <% for (var user in users) { %>
+              <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 user">
+                <h2><%= user %></h2>
+                <h3>Score <small><%= users[user].score %></small></h3>
+                <h3>Bet <small><%= users[user].bet %></small></h3>
+                <div class="form-inline">
+                  <div class="form-group">
+                    <label class="sr-only">Bet 5</label>
+                    <input type="button" value="5" class="bet btn btn-default" />
+                  </div>
+                  <div class="form-group">
+                    <label class="sr-only">Bet 10</label>
+                    <input type="button" value="10" class="bet btn btn-default" />
+                  </div>
+                  <button value="Win" class="win btn btn-success">Win</button>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="assets/index.js"></script>
+  </body>
+</html>
