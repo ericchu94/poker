@@ -1,4 +1,5 @@
 'use strict';
+const fs = require('fs');
 const Koa = require('koa');
 const co = require('co');
 const router = require('koa-router')();
@@ -14,13 +15,6 @@ app.use(co.wrap(function *(ctx, next) {
   console.log(`${ctx.method} ${ctx.url} - ${ctx.status} ${end - start} ms`);
 }));
 
-app.use(co.wrap(function *(ctx, next) {
-  yield next();
-  console.log({
-    users: app.context.users,
-  });
-}));
-
 app.use(views(__dirname + '/views', {
   map: {
     ejs: 'ejs',
@@ -32,14 +26,14 @@ router.get('/assets/*', serve('.'));
 
 router.get('/', co.wrap(function *(ctx, next) {
   yield ctx.render('index', {
-    users: app.context.users,
-    pot: app.context.pot,
+    users: app.context.game.users,
+    pot: app.context.game.pot,
   });
 }));
 
-router.put('/users', bodyParser(), co.wrap(function *(ctx, next) {
+router.put('/users', bodyParser(), co.wrap(updateContext),  co.wrap(function *(ctx, next) {
   const body = ctx.request.body;
-  const users = app.context.users;
+  const users = app.context.game.users;
   const user = body.user;
 
   if (user && !(user in users)) {
@@ -53,37 +47,52 @@ router.put('/users', bodyParser(), co.wrap(function *(ctx, next) {
   }
 }));
 
-router.post('/bet', bodyParser(), co.wrap(function *(ctx, next) {
+router.post('/bet', bodyParser(), co.wrap(updateContext),  co.wrap(function *(ctx, next) {
   const body = ctx.request.body;
-  const user = app.context.users[body.user]; 
+  const user = app.context.game.users[body.user]; 
   const amount = parseInt(body.amount);
 
   if (user.score - amount >= 0) {
     user.score -= amount;
     user.bet += amount;
-    app.context.pot += amount;
+    app.context.game.pot += amount;
     ctx.status = 200;
     yield next();
   }
 }));
 
-router.post('/win', bodyParser(), co.wrap(function *(ctx, next) {
+router.post('/win', bodyParser(), co.wrap(updateContext),  co.wrap(function *(ctx, next) {
   const body = ctx.request.body;
-  const users = app.context.users;
+  const users = app.context.game.users;
 
-  users[body.user].score += app.context.pot;
+  users[body.user].score += app.context.game.pot;
   for (const user in users)
     users[user].bet = 0;
 
-  app.context.pot = 0;
+  app.context.game.pot = 0;
   ctx.status = 200;
   yield next();
 }));
 
+function *updateContext(ctx, next) {
+  yield next();
+  console.log(app.context.game);
+  fs.writeFile('game.json', JSON.stringify(app.context.game));
+}
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.context.users = {};
-app.context.pot = 0;
+try {
+  const game = fs.readFileSync('game.json')
+  app.context.game = JSON.parse(game);
+}
+catch (err) {
+  console.log(`Failed to load save: ${err}`);
+  app.context.game = {
+    users: {},
+    pot: 0,
+  };
+}
 
 app.listen(3000);
